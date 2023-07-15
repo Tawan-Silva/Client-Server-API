@@ -1,0 +1,29 @@
+# Arquivos binários e executáveis
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Arquivos compilados
+*.o
+*.a
+*.out
+
+# Arquivos temporários
+*.tmp
+*.log
+*.swp
+*.swo
+
+# Arquivos de configuração local
+*.env
+.env.local
+
+# Arquivos gerados automaticamente
+cotacao.txt
+
+# Diretório de dependências
+/vendor/
+
+# Banco de dados local
+/currency.db
