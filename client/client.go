@@ -32,8 +32,6 @@ func main() {
 	saveQuoteToFile(quote)
 }
 
-// ...
-
 func getQuoteFromServer(ctx context.Context) (*Quote, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/cotacao", nil)
 	if err != nil {
