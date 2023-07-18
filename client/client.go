@@ -55,9 +55,8 @@ func getQuoteFromServer(ctx context.Context) (*Quote, error) {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		log.Println(res.Body)
-		log.Printf("Erro na resposta HTTP: %s", res.Status)
-		return nil, fmt.Errorf("erro na resposta HTTP: %s", res.Status)
+		body, _ := ioutil.ReadAll(res.Body)
+		return nil, fmt.Errorf("erro na resposta HTTP: %s, Message: %v", res.Status, string(body))
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
