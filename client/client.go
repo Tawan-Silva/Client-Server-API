@@ -24,6 +24,7 @@ func main() {
 	quote, err := getQuoteFromServer(ctx)
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 
 	log.Printf("Valor atual do câmbio: %.2f\n", quote.Bid)
@@ -74,9 +75,9 @@ func getQuoteFromServer(ctx context.Context) (*Quote, error) {
 }
 
 func saveQuoteToFile(quote *Quote) {
-	file, err := os.Create("cotacao.txt")
+	file, err := os.OpenFile("cotacao.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
-		log.Println("Erro ao criar o arquivo cotacao.txt:", err)
+		log.Println("Erro ao abrir o arquivo cotacao.txt:", err)
 		return
 	}
 	defer file.Close()

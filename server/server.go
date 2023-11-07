@@ -5,13 +5,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"time"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 type Quote struct {
@@ -77,20 +76,9 @@ type QuoteService struct {
 }
 
 func main() {
-	db, err := sql.Open("mysql", "root:12345678@tcp(localhost:3306)/")
+	db, err := sql.Open("sqlite3", "./db.sqlite")
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	err = createCurrencyDB(db)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	db, err = sql.Open("mysql", "root:12345678@tcp(localhost:3306)/currency")
-	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	defer db.Close()
 
@@ -127,8 +115,6 @@ func (s *QuoteService) GetUSDQuote(ctx context.Context) (*Quote, error) {
 	if err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
 			log.Println("Timeout do contexto atingido ao fazer a requisição HTTP para obter a cotação")
-		} else {
-			log.Printf("Erro ao fazer a requisição HTTP para obter a cotação: %v\n", err)
 		}
 		return nil, fmt.Errorf("erro ao fazer a requisição HTTP para obter a cotação: %v", err)
 	}
@@ -154,13 +140,13 @@ func HandleGetQuote(service *QuoteService, w http.ResponseWriter, r *http.Reques
 
 	quote, err := service.GetUSDQuote(ctx)
 	if err != nil {
-		http.Error(w, "Erro ao obter a cotação do dólar", http.StatusInternalServerError)
+		http.Error(w, "Erro ao obter a cotação do dólar. "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = service.repo.InsertQuote(ctx, quote)
 	if err != nil {
-		http.Error(w, "Erro ao salvar a cotação no banco de dados", http.StatusInternalServerError)
+		http.Error(w, "Erro ao salvar a cotação no banco de dados. "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
